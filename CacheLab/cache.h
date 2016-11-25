@@ -5,7 +5,7 @@
 #include "storage.h"
 
 #define HIT 0
-#define COLOD_MISS 1
+#define COLD_MISS 1
 #define CONFLICT_MISS 2
 
 

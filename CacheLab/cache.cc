@@ -14,32 +14,35 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
     if (!BypassDecision()) {
         PartitionAlgorithm(set, tag);
         condition = ReplaceDecision(set, tag, target);
+        hit = (condition == HIT) ? 1:0;
         switch (condition) {
             case CONFLICT_MISS:
-                // evict
-                ReplaceAlgorithm();
-            case COLOD_MISS:
+                if((read == false) && (config_.write_allocate == 1)){
+                   // write miss, write no allc, lower_->HandleRequest
+                    break;
+                }
+                target = ReplaceAlgorithm();
+                // swap into lower, mind dirty bit(dirty bit is only valid under writeback policy)
+            case COLD_MISS:
                 // load
                 if (PrefetchDecision()) {
                     PrefetchAlgorithm(); // change some load arguments, like 
                 }
                 
-                // read miss, write miss
+                // load here
+                // read miss, write miss alloc
                 
                 int lower_hit, lower_time;
                 lower_->HandleRequest(addr, bytes, read, content,
                                       lower_hit, lower_time);
                 time += latency_.bus_latency + lower_time;
                 stats_.access_time += latency_.bus_latency;
-                hit = 0;
                 break;
             case HIT:
-                
-                // read hit, write hit
-                
+                // read hit, write hit(writeback or writethrough)
+                // for HIT: 0|1 for back(set dirty bit, only change cache)|through(write both cache and lower level)
                 time += latency_.bus_latency + latency_.hit_latency;
                 stats_.access_time += time;
-                hit = 1;
                 break;
         }
     }
@@ -65,7 +68,7 @@ int Cache::ReplaceDecision(const int set, const unsigned int tag, int & target) 
         }
     }
     
-    if(target != -1) return COLOD_MISS;       // set has slots, target refers to the first slot in this set
+    if(target != -1) return COLD_MISS;       // set has slots, target refers to the first slot in this set
     
     return CONFLICT_MISS;
 }
