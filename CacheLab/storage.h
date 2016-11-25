@@ -12,7 +12,7 @@
 typedef struct StorageStats_ {
   int access_counter;
   int miss_num;
-  int access_time; // In nanoseconds
+  int access_time; // In nanoseconds, time used in current cache
   int replace_num; // Evict old lines
   int fetch_num; // Fetch lower layer
   int prefetch_num; // Prefetch
