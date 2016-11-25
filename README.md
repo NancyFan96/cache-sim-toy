@@ -28,11 +28,14 @@ g) Replacement Policy 统一定为 LRU,其他优化策略暂不考虑。
 
 ### 测试内容
 测试内容包含两个部分,实验的代码及相应的测试结果请分开提交:
+
 a) 使用附件中给定的 trace 通过单一层次 cache 测试
 
 * 观察在不同的 Cache Size(32KB – 32MB)的条件下,Miss Rate 随 Block Size 变化的趋势,收集数据并绘制折线图。
 * 观察在不同的CacheSize的条件下,MissRate随Associativity(1-32)变化的 趋势,收集数据并绘制折线图。
 * 比较 Write Through 和 Write Back、Write Allocate 和 No-write allocate 的总访 问延时的差异。
+
+
 b) 与 Lab2 中的 CPU Simulator 结合,运行 Dhrystone Benchmark。
 
 Level | Capacity | Associativity | Line Size(Bytes)|Write Update Policy
