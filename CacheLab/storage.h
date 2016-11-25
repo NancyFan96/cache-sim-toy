@@ -12,16 +12,16 @@
 typedef struct StorageStats_ {
   int access_counter;
   int miss_num;
-  int access_time; // In nanoseconds, time used in current cache
-  int replace_num; // Evict old lines
-  int fetch_num; // Fetch lower layer
+  int access_time;  // In nanoseconds, time used in current cache
+  int replace_num;  // Evict old lines
+  int fetch_num;    // Fetch lower layer
   int prefetch_num; // Prefetch
 } StorageStats;
 
 // Storage basic config
 typedef struct StorageLatency_ {
-  int hit_latency; // In nanoseconds
-  int bus_latency; // Added to each request
+  int hit_latency;  // In nanoseconds
+  int bus_latency;  // Added to each request
 } StorageLatency;
 
 class Storage {

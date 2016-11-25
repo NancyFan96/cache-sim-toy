@@ -13,6 +13,7 @@ typedef struct CacheConfig_ {
     int size;
     int associativity;
     int set_num;              // Number of cache sets
+    int block_size;
     int write_through;        // for HIT: 0|1 for back(set dirty bit, only change cache)|through(write both cache and lower level)
     int write_allocate;       // for MISS: 0|1 for no-alc(write into lower level, no loading)|alc(load block into cache and rewrite)
     int *RPP_front;            // Replace Policy tag, LRU, RPP_front[SET_NUM],需初始化为0
@@ -24,7 +25,7 @@ typedef struct Block_{
     bool valid_bit;
     bool dirty_bit;
     unsigned int tag;
-    int RPP_tag;            // Replace Policy tag
+    uint64_t RPP_tag;            // Replace Policy tag
 }Block;
 
 
@@ -46,10 +47,10 @@ class Cache: public Storage {
     // Bypassing
     int BypassDecision();                                       // Now, always false
     // Partitioning
-    void PartitionAlgorithm(int &set, unsigned int & tag);      // luyao, decode
+    void PartitionAlgorithm(int &set, unsigned int & tag, unsigned int & offset);      // luyao, decode
     // Replacement
     int ReplaceDecision(const int set,const unsigned int tag, int &target);   // fannaijia, return HIT, COLD_MISS or CONFLICT_MISS
-    int ReplaceAlgorithm();                                     // fannaijia, return victim's way number
+    int ReplaceAlgorithm(const int set);                                     // fannaijia, return victim's way number
     void SetRPP(const int set_id, Block & block);               // fannaijia,每个新进入Cache的block都需要调用这个函数
     // Prefetching
     int PrefetchDecision();       // Diminish now
