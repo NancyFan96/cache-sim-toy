@@ -146,6 +146,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
             case HIT:
                 // read hit, write hit(writeback or writethrough)
                 // for HIT: 0|1 for back(set dirty bit, only change cache)|through(write both cache and lower level)
+                printf("target = %d\n", target);
                 if(read == true){
                     content[0] = 'r';
                     content[1] = 'h';

@@ -188,17 +188,17 @@ int main(int argc,char *argv[])
     char content[64];
     char ch_wORr;
     uint64_t addr;
-    while(fscanf(input, "%c%llu", &ch_wORr, &addr) != EOF)
+    while(fscanf(input, "%c\t%llu\n", &ch_wORr, &addr) != EOF)
     {
-        printf("%c %llu\n", ch_wORr, addr);
+        printf("\n\b%c %llu\t\t", ch_wORr, addr);
         int bl_wORr = (ch_wORr == 'w' ? 0 : 1);
-        printf("\n\nr/w-%d, addr-%llu\n", bl_wORr, addr);
-        //l[1].HandleRequest(addr, 1, bl_wORr, content, hit, time);
-        //printf("Request access time: %dns\n", time);
+        printf("r/w-%d, addr-%llu", bl_wORr, addr);
+        l[1].HandleRequest(addr, 1, bl_wORr, content, hit, time);
+        printf("Request access time: %dns\n", time);
     }
     StorageStats s;
     l[1].GetStats(s);
-    printf("Total L1 access time: %dns\n", s.access_time);
+    printf("\n\nTotal L1 access time: %dns\n", s.access_time);
     m.GetStats(s);
     printf("Total Memory access time: %dns\n", s.access_time);
     fclose(input);

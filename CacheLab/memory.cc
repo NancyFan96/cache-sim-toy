@@ -4,10 +4,9 @@
 void Memory::HandleRequest(uint64_t addr, int bytes, int read,
                           char *content, int &hit, int &time) {
     printf("get into memory!\n");
-    printf("addr = 0x%llx(%lld), bytes = %d, read = %d\n", addr, addr, bytes, read);
+    //printf("addr = 0x%llx(%lld), bytes = %d, read = %d\n", addr, addr, bytes, read);
     // read
     if(read == TRUE){
-        printf("read mem\n");
         //for(int i = 0; i < bytes; i++)
           //  content[i] = this->mem_zero[addr+i];
         hit = 1;
@@ -16,7 +15,6 @@ void Memory::HandleRequest(uint64_t addr, int bytes, int read,
      }
     // write
     else {
-        printf("write mem\n");
         //for(int i = 0; i < bytes; i++)
         //    this->mem_zero[addr+i] = content[i];
         hit = 1;
