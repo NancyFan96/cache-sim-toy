@@ -1,8 +1,21 @@
 # cache-sim-toy
 
+## TODO
+
+* 输入文件会反复读同一行
+
+* 多层Cache还未检验
+
+* 是否要真的实现memory
+
+* 伪实现下，如何检验正确性
+
+
 ## LOGs
 
 0 commit: 分工发布
+
+1 commit: 初次合并，修正了大坑bug 
 
 ## 作业要求
 
@@ -24,6 +37,7 @@ e) 各层Cache的延迟保留两位小数,请根据需要从http://quid.hpl.hp.c
 *	Technology Node 固定为 65nm。
 	
 f) 各层存储介质之间的传输延时暂不考虑。
+
 g) Replacement Policy 统一定为 LRU,其他优化策略暂不考虑。
 
 ### 测试内容
