@@ -113,7 +113,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
         switch (condition) {
             case CONFLICT_MISS:
                 if((read == WRITE) && (config_.write_allocate == 0)){
-                    // write miss, write no allc, lower_->HandleRequest
+                   // write miss, write no allc, lower_->HandleRequest
                     int lower_hit, lower_time;
                     lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                     time += latency_.bus_latency + lower_time;
@@ -123,7 +123,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 }
                 target = ReplaceAlgorithm(set);
                 printf("target = %d\n", target);
-                
+
                 // evict, mind dirty bit(dirty bit is only valid under writeback policy)
                 stats_.replace_num++;
                 cache_[set][target].valid_bit = 0;
@@ -151,7 +151,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 
                 if(read == WRITE && config_.write_allocate == 0){
                     cache_[set][target].dirty_bit = 1;
-                    
+
                     int lower_hit, lower_time;
                     lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                     stats_.fetch_num++;
@@ -161,7 +161,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 }
                 if(read == WRITE && config_.write_allocate == 1){
                     cache_[set][target].dirty_bit = 1;
-                    
+
                     int lower_hit, lower_time;
                     lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                     stats_.fetch_num++;
@@ -180,9 +180,11 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                     break;
                 }
                 if(read == READ){
+                    printf("hhh\n");
                     int lower_hit, lower_time;
                     lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                     stats_.fetch_num++;
+                    printf("hhh\n");
                     while(bytes!=0){
                         int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
                         memcpy(cache_[set][target].block_content, content, cur_read_bytes);
@@ -217,7 +219,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                             target = 0;
                         }
                     }//while: read by byte
-                }
+                 }
                 else{
                     // write back, write through use a buffer, so no latency need to plus
                     cache_[set][target].valid_bit = 1;
@@ -246,6 +248,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
         }
     }
 }
+
 
 int Cache::BypassDecision() {
     return FALSE;
