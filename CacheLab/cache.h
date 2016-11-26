@@ -29,7 +29,7 @@ typedef struct Block_{
     bool dirty_bit;
     unsigned int tag;
     uint64_t RPP_tag;            // Replace Policy tag
-    byte * block_content;
+    char * block_content;
 }Block;
 
 
@@ -38,6 +38,7 @@ class Cache: public Storage {
     Cache();
     ~Cache(){};
     
+    void cachehelp();
     // Sets & Gets
     void SetConfig(CacheConfig cc);
     void GetConfig(CacheConfig cc);

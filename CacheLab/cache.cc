@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG
+#define MAXLEVEL 3
 
 inline int lg2(const int x)
 {
@@ -17,6 +17,8 @@ inline int lg2(const int x)
     }
     return num;
 }
+
+Cache l[MAXLEVEL + 1];
 
 Cache::Cache()
 {
@@ -32,7 +34,7 @@ Cache::Cache()
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
         for(int j = 0; j < config_.associativity; j++){
-            cache_[i][j].block_content = new byte[config_.block_size];
+            cache_[i][j].block_content = new char[config_.block_size];
         }
     }
 }
@@ -40,6 +42,7 @@ Cache::Cache()
 
 void Cache::SetConfig(CacheConfig cc)
 {
+    int old_set_num = config_.set_num;
     config_ .size = cc.size;
     config_ .block_size = cc.block_size;
     config_ .associativity = cc.associativity;
@@ -51,7 +54,7 @@ void Cache::SetConfig(CacheConfig cc)
            config_ .size, config_ .block_size, config_ .associativity, config_ .set_num);
     printf("write_through(back) = %d, write_alloc(no-alloc) = %d\n", config_ .write_through, config_ .write_allocate);
     
-    for(int i = 0; i < config_.set_num; i++) {
+    for(int i = 0; i < old_set_num; i++) {
         delete [] cache_[i];
     }
     delete [] cache_;
@@ -61,7 +64,7 @@ void Cache::SetConfig(CacheConfig cc)
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
         for(int j = 0; j < config_.associativity; j++){
-            cache_[i][j].block_content = new byte[config_.block_size];
+            cache_[i][j].block_content = new char[config_.block_size];
         }
     }
 }
@@ -100,6 +103,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
         
         condition = ReplaceDecision(set, tag, target);
         printf("condition TAG = %d(0|1|2:hit|cold|conflict)\t", condition);
+        
         hit = (condition == HIT) ? 1:0;
         stats_.access_counter++;
         if (hit == 0) {
@@ -108,8 +112,8 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
         
         switch (condition) {
             case CONFLICT_MISS:
-                if((read == false) && (config_.write_allocate == 0)){
-                   // write miss, write no allc, lower_->HandleRequest
+                if((read == WRITE) && (config_.write_allocate == 0)){
+                    // write miss, write no allc, lower_->HandleRequest
                     int lower_hit, lower_time;
                     lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                     time += latency_.bus_latency + lower_time;
@@ -119,7 +123,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 }
                 target = ReplaceAlgorithm(set);
                 printf("target = %d\n", target);
-
+                
                 // evict, mind dirty bit(dirty bit is only valid under writeback policy)
                 stats_.replace_num++;
                 cache_[set][target].valid_bit = 0;
@@ -127,27 +131,73 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 if(config_.write_through == 0 && cache_[set][target].dirty_bit == 1){
                     int lower_hit, lower_time;
                     uint64_t victim_address = (tag<<offset_tag)||(set<<offset_set);
-                    char victim_content[16]; //!!
+                    char *victim_content = new char[config_.block_size];
+                    memcpy(victim_content, cache_[set][target].block_content, config_.block_size);
                     lower_->HandleRequest(victim_address, config_.block_size, WRITE, victim_content,
                                           lower_hit, lower_time);
                 }
-
             case COLD_MISS:
                 // load
                 if (PrefetchDecision()) {
                     PrefetchAlgorithm(); // change some load arguments, no need for Lab3-1
                 }
                 printf("target = %d\n", target);
-                if(read == true || (read == false && config_.write_allocate == 1)){
+                if(read == READ || (read == WRITE && config_.write_allocate == 1)){
                     cache_[set][target].valid_bit = 1;
+                    cache_[set][target].dirty_bit = 0;
                     cache_[set][target].tag = tag;
                     SetRPP(set, cache_[set][target]);
                 }
-                int lower_hit, lower_time;
-                lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
-                time += latency_.bus_latency + lower_time;
-                stats_.access_time += latency_.bus_latency;
-                break;
+                
+                if(read == WRITE && config_.write_allocate == 0){
+                    cache_[set][target].dirty_bit = 1;
+                    
+                    int lower_hit, lower_time;
+                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+                    stats_.fetch_num++;
+                    time += latency_.bus_latency + lower_time;
+                    stats_.access_time += latency_.bus_latency;
+                    break;
+                }
+                if(read == WRITE && config_.write_allocate == 1){
+                    cache_[set][target].dirty_bit = 1;
+                    
+                    int lower_hit, lower_time;
+                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+                    stats_.fetch_num++;
+                    while(bytes!=0){
+                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
+                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
+                        bytes -= cur_read_bytes;
+                        target++;
+                        if(target == config_.associativity){
+                            set++;
+                            target = 0;
+                        }
+                    }
+                    time += latency_.bus_latency + lower_time;
+                    stats_.access_time += latency_.bus_latency;
+                    break;
+                }
+                if(read == READ){
+                    int lower_hit, lower_time;
+                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+                    stats_.fetch_num++;
+                    while(bytes!=0){
+                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
+                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
+                        bytes -= cur_read_bytes;
+                        target++;
+                        if(target == config_.associativity){
+                            set++;
+                            target = 0;
+                        }
+                    }
+                    time += latency_.bus_latency + lower_time;
+                    stats_.access_time += latency_.bus_latency;
+                    break;
+                }
+                
                 
             case HIT:
                 // read hit, write hit(writeback or writethrough)
@@ -157,13 +207,37 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                     cache_[set][target].valid_bit = 1;
                     cache_[set][target].tag = tag;
                     SetRPP(set, cache_[set][target]);
-                 }
+                    while(bytes!=0){
+                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
+                        memcpy(content, cache_[set][target].block_content, cur_read_bytes);
+                        bytes -= cur_read_bytes;
+                        target++;
+                        if(target == config_.associativity){
+                            set++;
+                            target = 0;
+                        }
+                    }//while: read by byte
+                }
                 else{
                     // write back, write through use a buffer, so no latency need to plus
                     cache_[set][target].valid_bit = 1;
                     cache_[set][target].dirty_bit = 1;
                     cache_[set][target].tag = tag;
                     SetRPP(set, cache_[set][target]);
+                    while(bytes!=0){
+                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
+                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
+                        bytes -= cur_read_bytes;
+                        target++;
+                        if(target == config_.associativity){
+                            set++;
+                            target = 0;
+                        }
+                    }//while: write by byte
+                    if(config_.write_through == 1){
+                        int lower_hit, lower_time;
+                        lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+                    }
                 }
                 
                 time += latency_.bus_latency + latency_.hit_latency;
@@ -174,7 +248,7 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
 }
 
 int Cache::BypassDecision() {
-  return FALSE;
+    return FALSE;
 }
 
 void Cache::PartitionAlgorithm() {
@@ -220,7 +294,7 @@ void Cache::SetRPP(const int set_id, Block & block){
 }
 
 int Cache::PrefetchDecision() {
-  return FALSE;
+    return FALSE;
 }
 
 void Cache::PrefetchAlgorithm() {
