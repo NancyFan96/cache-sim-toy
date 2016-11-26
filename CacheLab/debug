@@ -1,0 +1,68 @@
+size = 32, block_size = 64, assc = 8, set_num = 64
+write_through(back) = 0, write_alloc(no-alloc) = 0
+
+
+r/w-1, addr-1000
+
+addr = 0x3e8(1000), offset_set = 6, offset_tag = 12
+set = 0xf, tag = 0x0, offset = 0x3e8, read = 1
+condition TAG = 1(0|1|2:hit|cold|conflict)	target = 0
+get into memory!
+addr = 0x3e8(1000), bytes = 1, read = 1
+read mem
+Request access time: 109ns
+
+
+r/w-1, addr-1000
+
+addr = 0x3e8(1000), offset_set = 6, offset_tag = 12
+set = 0xf, tag = 0x0, offset = 0x3e8, read = 1
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+
+
+r/w-0, addr-1000
+
+addr = 0x3e8(1000), offset_set = 6, offset_tag = 12
+set = 0xf, tag = 0x0, offset = 0x3e8, read = 0
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+
+
+r/w-1, addr-1000
+
+addr = 0x3e8(1000), offset_set = 6, offset_tag = 12
+set = 0xf, tag = 0x0, offset = 0x3e8, read = 1
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+
+
+r/w-1, addr-1200
+
+addr = 0x4b0(1200), offset_set = 6, offset_tag = 12
+set = 0x12, tag = 0x0, offset = 0x4b0, read = 1
+condition TAG = 1(0|1|2:hit|cold|conflict)	target = 0
+get into memory!
+addr = 0x4b0(1200), bytes = 1, read = 1
+read mem
+Request access time: 109ns
+
+
+r/w-1, addr-1200
+
+addr = 0x4b0(1200), offset_set = 6, offset_tag = 12
+set = 0x12, tag = 0x0, offset = 0x4b0, read = 1
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+
+
+r/w-1, addr-1200
+
+addr = 0x4b0(1200), offset_set = 6, offset_tag = 12
+set = 0x12, tag = 0x0, offset = 0x4b0, read = 1
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+
+
+r/w-1, addr-1200
+
+addr = 0x4b0(1200), offset_set = 6, offset_tag = 12
+set = 0x12, tag = 0x0, offset = 0x4b0, read = 1
+condition TAG = 0(0|1|2:hit|cold|conflict)	Request access time: 13ns
+Total L1 access time: 84ns
+Total Memory access time: 212ns

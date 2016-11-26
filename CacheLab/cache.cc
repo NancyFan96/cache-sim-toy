@@ -1,6 +1,75 @@
 #include "cache.h"
 #include "def.h"
 #include <time.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define DEBUG
+
+inline int lg2(const int x)
+{
+    int num = 0;
+    int xx = x;
+    while(xx != 1)
+    {
+        xx = xx >> 1;
+        num ++;
+    }
+    return num;
+}
+
+Cache::Cache()
+{
+    config_.size = 32;
+    config_.block_size = 64;
+    config_.associativity = 8;
+    config_.set_num = 64;
+    config_.write_through = 0;
+    config_.write_allocate = 0;
+    lower_ = NULL;
+    cache_ = new Block *[config_.set_num];
+    for(int i = 0; i < config_.set_num; i++) {
+        cache_[i] = new Block[config_.associativity];
+        memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+    }
+}
+
+
+void Cache::SetConfig(CacheConfig cc)
+{
+    config_ .size = cc.size;
+    config_ .block_size = cc.block_size;
+    config_ .associativity = cc.associativity;
+    config_ .set_num = cc.set_num;
+    config_ .write_through = cc.write_through;
+    config_ .write_allocate = cc.write_allocate;
+    
+    printf("size = %d, block_size = %d, assc = %d, set_num = %d\n",
+           config_ .size, config_ .block_size, config_ .associativity, config_ .set_num);
+    printf("write_through(back) = %d, write_alloc(no-alloc) = %d\n", config_ .write_through, config_ .write_allocate);
+    
+    for(int i = 0; i < config_.set_num; i++) {
+        delete [] cache_[i];
+    }
+    delete [] cache_;
+    
+    cache_ = new Block *[config_.set_num];
+    for(int i = 0; i < config_.set_num; i++) {
+        cache_[i] = new Block[config_.associativity];
+        memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+    }
+}
+
+void Cache::GetConfig(CacheConfig cc)
+{
+    cc.size = config_.size;
+    cc.block_size = config_.block_size;
+    cc.associativity = config_.associativity;
+    cc.set_num = config_.set_num;
+    cc.write_through = config_.write_through;
+    cc.write_allocate = config_.write_allocate;
+}
+
 
 void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                           char *content, int &hit, int &time) {
@@ -10,11 +79,21 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
     unsigned int tag, offset;
     int target = -1;
     int condition = -1;
-
+    
     // Bypass
     if (!BypassDecision()) {
-        PartitionAlgorithm(set, tag, offset);
+        PartitionAlgorithm();
+        int offset_set = lg2(config_.block_size);
+        int offset_tag = lg2(config_.set_num) + lg2(config_.block_size);
+        set = (int)((addr & ONES((offset_tag-1),offset_set)) >> offset_set);
+        tag = (unsigned int)((addr & ONES(63,offset_tag)) >> offset_tag);
+        offset = (unsigned int)(addr & ONES((offset_tag-1), 0));
+        
+        printf("\naddr = 0x%llx(%lld), offset_set = %d, offset_tag = %d\n", addr, addr, offset_set, offset_tag);
+        printf("set = 0x%x, tag = 0x%x, offset = 0x%x, read = %d\n", set, tag, offset, read);
+        
         condition = ReplaceDecision(set, tag, target);
+        printf("condition TAG = %d(0|1|2:hit|cold|conflict)\t", condition);
         hit = (condition == HIT) ? 1:0;
         stats_.access_counter++;
         if (hit == 0) {
@@ -33,15 +112,17 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                     break;
                 }
                 target = ReplaceAlgorithm(set);
+                printf("target = %d\n", target);
+
                 // evict, mind dirty bit(dirty bit is only valid under writeback policy)
                 stats_.replace_num++;
                 cache_[set][target].valid_bit = 0;
                 if(config_.write_through == 0 && cache_[set][target].dirty_bit == 1){
                     int lower_hit, lower_time;
-                    uint64_t victim_address = (tag<<1)||(set<<1);   // !!!!
+                    uint64_t victim_address = (tag<<offset_tag)||(set<<offset_set);
                     char * victim_content;
                     victim_content[0] = 'v'; victim_content[1] = 0;
-                    lower_->HandleRequest(victim_address, config_.block_size, 0, victim_content,
+                    lower_->HandleRequest(victim_address, config_.block_size, WRITE, victim_content,
                                           lower_hit, lower_time);
                 }
 
@@ -50,10 +131,12 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 if (PrefetchDecision()) {
                     PrefetchAlgorithm(); // change some load arguments, no need for Lab3-1
                 }
+                printf("target = %d\n", target);
                 if(read == true || (read == false && config_.write_allocate == 1)){
+                    cache_[set][target].valid_bit = 1;
+                    cache_[set][target].tag = tag;
                     SetRPP(set, cache_[set][target]);
                 }
-                
                 int lower_hit, lower_time;
                 lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
                 time += latency_.bus_latency + lower_time;
@@ -90,24 +173,21 @@ int Cache::BypassDecision() {
   return FALSE;
 }
 
-void Cache::PartitionAlgorithm(int &set, unsigned int & tag, unsigned int & offset) {
+void Cache::PartitionAlgorithm() {
 }
 
 int Cache::ReplaceDecision(const int set, const unsigned int tag, int & target) {
-    Block * cur_set = cache_[set];
     target = -1;
     for(int i = 0; i < config_.associativity; i++){
-        if(cur_set[i].valid_bit == true && cur_set[i].tag == tag){
+        if(cache_[set][i].valid_bit == true && cache_[set][i].tag == tag){
             target = i;
             return HIT;
         }
-        if(target == -1 && cur_set[i].valid_bit == false){
+        if(target == -1 && cache_[set][i].valid_bit == false){
             target = i;
         }
     }
-    
     if(target != -1) return COLD_MISS;       // set has slots, target refers to the first slot in this set
-    
     return CONFLICT_MISS;
 }
 
