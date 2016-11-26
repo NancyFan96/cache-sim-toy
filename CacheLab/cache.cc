@@ -117,11 +117,11 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 // evict, mind dirty bit(dirty bit is only valid under writeback policy)
                 stats_.replace_num++;
                 cache_[set][target].valid_bit = 0;
+                printf("hhh\n");
                 if(config_.write_through == 0 && cache_[set][target].dirty_bit == 1){
                     int lower_hit, lower_time;
                     uint64_t victim_address = (tag<<offset_tag)||(set<<offset_set);
-                    char * victim_content;
-                    victim_content[0] = 'v'; victim_content[1] = 0;
+                    char victim_content[16]; //!!
                     lower_->HandleRequest(victim_address, config_.block_size, WRITE, victim_content,
                                           lower_hit, lower_time);
                 }
@@ -148,9 +148,6 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int read,
                 // for HIT: 0|1 for back(set dirty bit, only change cache)|through(write both cache and lower level)
                 printf("target = %d\n", target);
                 if(read == true){
-                    content[0] = 'r';
-                    content[1] = 'h';
-                    content[2] = 0;
                     cache_[set][target].valid_bit = 1;
                     cache_[set][target].tag = tag;
                     SetRPP(set, cache_[set][target]);
