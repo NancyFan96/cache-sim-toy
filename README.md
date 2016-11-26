@@ -2,13 +2,9 @@
 
 ## TODO
 
-* 1.trace, when evict, segmentation fault
+* 多层Cache待dhy检验
 
-* 多层Cache还未检验
-
-* 是否要真的实现memory
-
-* 伪实现下，如何检验正确性
+* 真的实现r/w
 
 
 ## LOGs
@@ -18,6 +14,8 @@
 1 commit: 初次合并，修正了大坑bug 
 
 1.3 commit: fixed bug in fscanf; can run my.trace correctly, 1.trace segmentation fault, 2.trace done(not surely correct)
+
+2.0 commit: presudo cache r/w, result is RIGHT~
 
 ## 作业要求
 
