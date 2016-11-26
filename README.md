@@ -2,7 +2,7 @@
 
 ## TODO
 
-* 输入文件会反复读同一行
+* 1.trace, when evict, segmentation fault
 
 * 多层Cache还未检验
 
@@ -16,6 +16,8 @@
 0 commit: 分工发布
 
 1 commit: 初次合并，修正了大坑bug 
+
+1.3 commit: fixed bug in fscanf; can run my.trace correctly, 1.trace segmentation fault, 2.trace done(not surely correct)
 
 ## 作业要求
 
