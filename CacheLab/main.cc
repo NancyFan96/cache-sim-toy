@@ -190,10 +190,11 @@ int main(int argc,char *argv[])
     uint64_t addr;
     while(fscanf(input, "%c%llu", &ch_wORr, &addr) != EOF)
     {
+        printf("%c %llu\n", ch_wORr, addr);
         int bl_wORr = (ch_wORr == 'w' ? 0 : 1);
         printf("\n\nr/w-%d, addr-%llu\n", bl_wORr, addr);
-        l[1].HandleRequest(addr, 1, bl_wORr, content, hit, time);
-        printf("Request access time: %dns\n", time);
+        //l[1].HandleRequest(addr, 1, bl_wORr, content, hit, time);
+        //printf("Request access time: %dns\n", time);
     }
     StorageStats s;
     l[1].GetStats(s);
