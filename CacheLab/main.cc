@@ -61,10 +61,6 @@ void Initial(StorageStats& storage_stats, StorageLatency& latency_m, StorageLate
 
 void GetSettings(int& argc, char *argv[], int& levelNum, CacheConfig* cache_config, StorageLatency* latency_c, FILE*& input)
 {
-#ifdef DEBUG
-    input = fopen("../my.trace", "r");
-#endif
-#ifndef DEBUG
     int j = 0,argCount = 0;
     for(argc--, argv++; argc > 0 ; argc -= argCount, argv += argCount)
     {
@@ -111,7 +107,7 @@ void GetSettings(int& argc, char *argv[], int& levelNum, CacheConfig* cache_conf
                 j = atoi(*(argv + i));
                 check(j < 4 && j >= 0, "invalid policy");
                 cache_config[i].write_through = j & 1;  // least significant bit represents whether to write through
-                cache_config[i].write_allocate = j & 2; // second least significant bit represents whether to write allocate
+                cache_config[i].write_allocate = (j & 2) >> 1; // second least significant bit represents whether to write allocate
             }
             argCount = levelNum + 1;
         }
@@ -143,7 +139,6 @@ void GetSettings(int& argc, char *argv[], int& levelNum, CacheConfig* cache_conf
         check(cache_config[i].block_size * cache_config[i].associativity *  cache_config[i].set_num== cache_config[i].size * 1024,
               "invalid cache setting, as cache size can't match the associativity and block size");
     }
-#endif
 }
 
 void SetSettings(Memory& m, Cache* l, StorageStats& storage_stats, CacheConfig* cache_config, StorageLatency& latency_m, StorageLatency* latency_c, int levelNum)
@@ -169,10 +164,23 @@ void SetSettings(Memory& m, Cache* l, StorageStats& storage_stats, CacheConfig* 
     }
 }
 
+void help(){
+    printf("\nThis is a simulator for cache!\n");
+    printf("    Usage: ./sim -f [filename]\n");
+    printf("                 -l [cache level] -s [cache size] -a [way num] -b [block size] \n");
+    printf("                 -p [policy1...l:0|1|2|3:(write_back&write_non_allocate)|(through&non_allc)|(back&alloc)|(through&alloc)]\n");
+    printf("                 -h [l1 hitlatency] [l2 hitlatency]...\n");
+    printf("                 --help\n\n");
+}
+
 int main(int argc,char *argv[])
 {
-    CacheConfig cache_config[MAXLEVEL+1];
+    if(argc <= 2|| strcmp(argv[1],"--help") == 0){
+        help();
+    }
+    
     int levelNum = 0;
+    CacheConfig cache_config[MAXLEVEL+1];
     StorageStats storage_stats;
     StorageLatency latency_m, latency_c[MAXLEVEL + 1];
     Initial(storage_stats, latency_m, latency_c, cache_config, levelNum);
@@ -197,8 +205,15 @@ int main(int argc,char *argv[])
         printf("Request access time: %dns\n", time);
     }
     StorageStats s;
-    l[1].GetStats(s);
-    printf("\n\nTotal L1 access time: %dns\n", s.access_time);
+    for(int i = 1; i <= levelNum; i++){
+        l[i].GetStats(s);
+        printf("\n\nTotal L1 access time: %dns\n", s.access_time);
+        printf("Total L1 access counter: %d\n", s.access_counter);
+        printf("Total L1 miss num: %d\n", s.miss_num);
+        printf("Total L1 hit num: %d\n", s.access_counter - s.miss_num);
+        printf("L1 miss rate: %lf\n", (double)s.miss_num/s.access_counter);
+        printf("Total L1 access time: %dns\n\n", s.access_time);
+    }
     m.GetStats(s);
     printf("Total Memory access time: %dns\n", s.access_time);
     fclose(input);

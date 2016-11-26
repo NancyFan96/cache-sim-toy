@@ -16,7 +16,7 @@ void Memory::HandleRequest(uint64_t addr, int bytes, int read,
     // write
     else {
         //for(int i = 0; i < bytes; i++)
-        //    this->mem_zero[addr+i] = content[i];
+          //  this->mem_zero[addr+i] = content[i];
         hit = 1;
         time = latency_.hit_latency + latency_.bus_latency;
         stats_.access_time += time;
@@ -26,6 +26,5 @@ void Memory::HandleRequest(uint64_t addr, int bytes, int read,
 
 
 Memory::Memory(){
-    mem_zero = new byte[1];
+    mem_zero = new byte[1<<28];
 }
-

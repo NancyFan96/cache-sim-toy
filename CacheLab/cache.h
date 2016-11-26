@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "storage.h"
+#include "def.h"
 
 #define HIT 0
 #define COLD_MISS 1
@@ -28,6 +29,7 @@ typedef struct Block_{
     bool dirty_bit;
     unsigned int tag;
     uint64_t RPP_tag;            // Replace Policy tag
+    byte * block_content;
 }Block;
 
 

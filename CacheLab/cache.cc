@@ -20,7 +20,7 @@ inline int lg2(const int x)
 
 Cache::Cache()
 {
-    config_.size = 32;
+    config_.size = 32;//KB
     config_.block_size = 64;
     config_.associativity = 8;
     config_.set_num = 64;
@@ -31,6 +31,9 @@ Cache::Cache()
     for(int i = 0; i < config_.set_num; i++) {
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+        for(int j = 0; j < config_.associativity; j++){
+            cache_[i][j].block_content = new byte[config_.block_size];
+        }
     }
 }
 
@@ -57,6 +60,9 @@ void Cache::SetConfig(CacheConfig cc)
     for(int i = 0; i < config_.set_num; i++) {
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+        for(int j = 0; j < config_.associativity; j++){
+            cache_[i][j].block_content = new byte[config_.block_size];
+        }
     }
 }
 
