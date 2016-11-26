@@ -66,7 +66,7 @@ void GetSettings(int& argc, char *argv[], int& levelNum, CacheConfig* cache_conf
 #endif
 #ifndef DEBUG
     int j = 0,argCount = 0;
-    for(argc--, argv++; argc > 0 ; argc -= argCount, argv -= argCount)
+    for(argc--, argv++; argc > 0 ; argc -= argCount, argv += argCount)
     {
         argCount = 1;
         if(!strcmp(*argv, "-f")) // set cache level num
