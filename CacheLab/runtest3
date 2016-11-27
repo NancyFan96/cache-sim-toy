@@ -1,0 +1,26 @@
+#!/bin/sh
+echo "\ntrace1...\n"
+./sim -f ../1.trace -l 1 -s 32 -a 8 -b 64 -p 2 -h 4
+./sim -f ../1.trace -l 1 -s 32 -a 8 -b 64 -p 1 -h 4
+./sim -f ../1.trace -l 1 -s 32 -a 8 -b 128 -p 2 -h 7
+./sim -f ../1.trace -l 1 -s 32 -a 8 -b 128 -p 1 -h 7
+./sim -f ../1.trace -l 1 -s 64 -a 8 -b 256 -p 2 -h 12
+./sim -f ../1.trace -l 1 -s 64 -a 8 -b 256 -p 1 -h 12
+./sim -f ../1.trace -l 1 -s 64 -a 16 -b 128 -p 2 -h 12
+./sim -f ../1.trace -l 1 -s 64 -a 16 -b 128 -p 1 -h 12
+./sim -f ../1.trace -l 1 -s 128 -a 8 -b 128 -p 2 -h 7
+./sim -f ../1.trace -l 1 -s 128 -a 8 -b 128 -p 1 -h 7
+
+echo "\ntrace2...\n"
+./sim -f ../2.trace -l 1 -s 32 -a 8 -b 64 -p 2 -h 4
+./sim -f ../2.trace -l 1 -s 32 -a 8 -b 64 -p 1 -h 4
+./sim -f ../2.trace -l 1 -s 32 -a 8 -b 128 -p 2 -h 7
+./sim -f ../2.trace -l 1 -s 32 -a 8 -b 128 -p 1 -h 7
+./sim -f ../2.trace -l 1 -s 64 -a 8 -b 256 -p 2 -h 12
+./sim -f ../2.trace -l 1 -s 64 -a 8 -b 256 -p 1 -h 12
+./sim -f ../2.trace -l 1 -s 64 -a 16 -b 128 -p 2 -h 12
+./sim -f ../2.trace -l 1 -s 64 -a 16 -b 128 -p 1 -h 12
+./sim -f ../2.trace -l 1 -s 128 -a 8 -b 128 -p 2 -h 7
+./sim -f ../2.trace -l 1 -s 128 -a 8 -b 128 -p 1 -h 7
+
+

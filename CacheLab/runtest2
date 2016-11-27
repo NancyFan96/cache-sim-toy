@@ -1,0 +1,87 @@
+#!/bin/sh
+echo "\ntrace1\n"
+./sim -f ../1.trace -l 1 -s 32 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 32 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 32 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 32 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 32 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 32 -a 32 -b 128 -p 2
+
+./sim -f ../1.trace -l 1 -s 64 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 64 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 64 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 64 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 64 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 64 -a 32 -b 128 -p 2
+
+./sim -f ../1.trace -l 1 -s 128 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 128 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 128 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 128 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 128 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 128 -a 32 -b 128 -p 2
+
+./sim -f ../1.trace -l 1 -s 256 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 256 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 256 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 256 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 256 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 256 -a 32 -b 128 -p 2
+
+./sim -f ../1.trace -l 1 -s 512 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 512 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 512 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 512 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 512 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 512 -a 32 -b 128 -p 2
+
+./sim -f ../1.trace -l 1 -s 1024 -a 1 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 1024 -a 2 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 1024 -a 4 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 1024 -a 8 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 1024 -a 16 -b 128 -p 2
+./sim -f ../1.trace -l 1 -s 1024 -a 32 -b 128 -p 2
+
+
+echo "\ntrace2\n"
+./sim -f ../2.trace -l 1 -s 32 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 32 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 32 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 32 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 32 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 32 -a 32 -b 128 -p 2
+
+./sim -f ../2.trace -l 1 -s 64 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 64 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 64 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 64 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 64 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 64 -a 32 -b 128 -p 2
+
+./sim -f ../2.trace -l 1 -s 128 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 128 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 128 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 128 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 128 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 128 -a 32 -b 128 -p 2
+
+./sim -f ../2.trace -l 1 -s 256 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 256 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 256 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 256 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 256 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 256 -a 32 -b 128 -p 2
+
+./sim -f ../2.trace -l 1 -s 512 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 512 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 512 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 512 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 512 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 512 -a 32 -b 128 -p 2
+
+./sim -f ../2.trace -l 1 -s 1024 -a 1 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 1024 -a 2 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 1024 -a 4 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 1024 -a 8 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 1024 -a 16 -b 128 -p 2
+./sim -f ../2.trace -l 1 -s 1024 -a 32 -b 128 -p 2

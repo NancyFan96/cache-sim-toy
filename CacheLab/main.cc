@@ -37,12 +37,12 @@ void Initial(StorageStats& storage_stats, StorageLatency& latency_m, StorageLate
     storage_stats.fetch_num = 0;
     storage_stats.prefetch_num = 0;
     
-    latency_m.bus_latency = 6;
-    latency_m.hit_latency = 100;
+    latency_m.bus_latency = 100;
+    latency_m.hit_latency = 0;
     
     for(int i = 1; i <= MAXLEVEL; i++)
     {
-        latency_c[i].bus_latency = 3;
+        latency_c[i].bus_latency = 0;
         latency_c[i].hit_latency = 10;
     }
     
@@ -198,24 +198,30 @@ int main(int argc,char *argv[])
     uint64_t addr;
     while(fscanf(input, "%c\t%llu\n", &ch_wORr, &addr) != EOF)
     {
-        printf("\n\b%c %llu\t\t", ch_wORr, addr);
+        //printf("\n\b%c %llu\t\t", ch_wORr, addr);
         int bl_wORr = (ch_wORr == 'w' ? 0 : 1);
-        printf("r/w-%d, addr-%llu", bl_wORr, addr);
+        //printf("r/w-%d, addr-%llu", bl_wORr, addr);
         l[1].HandleRequest(addr, 1, bl_wORr, content, hit, time);
-        printf("Request access time: %dns\n", time);
+        //printf("Request access time: %dns\n", time);
     }
     StorageStats s;
     for(int i = 1; i <= levelNum; i++){
         l[i].GetStats(s);
-        printf("\n\nTotal L1 access time: %dns\n", s.access_time);
-        printf("Total L1 access counter: %d\n", s.access_counter);
-        printf("Total L1 miss num: %d\n", s.miss_num);
-        printf("Total L1 hit num: %d\n", s.access_counter - s.miss_num);
-        printf("L1 miss rate: %lf\n", (double)s.miss_num/s.access_counter);
-        printf("Total L1 access time: %dns\n\n", s.access_time);
+        printf("\n\n---------L%d----------\n", i);
+        printf("Total L%d access time: %dns\n", i, s.access_time);
+        printf("Total L%d access counter: %d\n", i, s.access_counter);
+        printf("Total L%d miss num: %d\n", i, s.miss_num);
+        printf("Total L%d hit num: %d\n", i, s.access_counter - s.miss_num);
+        printf("L%d miss rate: %lf\n", i, (double)s.miss_num/s.access_counter);
+        printf("Total L%d replace num: %d\n", i, s.replace_num);
+        printf("Total L%d fetch num: %d\n", i, s.fetch_num);
+        printf("Total L%d prefetch num: %d\n", i, s.prefetch_num);
+        printf("Total L%d access time: %d\n", i, s.access_time);
     }
     m.GetStats(s);
-    printf("Total Memory access time: %dns\n", s.access_time);
+    printf("\n\n---------M----------\n");
+    printf("Total M access counter: %d\n", s.access_counter);
+    printf("Total Memory access time: %d\n\n\n", s.access_time);
     fclose(input);
     return 0;
 }

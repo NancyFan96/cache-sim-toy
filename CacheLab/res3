@@ -1,0 +1,426 @@
+
+trace1...
+
+size = 32, block_size = 64, assc = 8, set_num = 64
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 152ns
+Total L1 access counter: 10000
+Total L1 miss num: 9962
+Total L1 hit num: 38
+L1 miss rate: 0.996200
+Total L1 replace num: 9450
+Total L1 fetch num: 14665
+Total L1 prefetch num: 0
+Total L1 access time: 152
+
+
+---------M----------
+Total M access counter: 14665
+Total Memory access time: 1466500
+
+
+size = 32, block_size = 64, assc = 8, set_num = 64
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 96ns
+Total L1 access counter: 10000
+Total L1 miss num: 9976
+Total L1 hit num: 24
+L1 miss rate: 0.997600
+Total L1 replace num: 4492
+Total L1 fetch num: 9976
+Total L1 prefetch num: 0
+Total L1 access time: 96
+
+
+---------M----------
+Total M access counter: 9991
+Total Memory access time: 999100
+
+
+size = 32, block_size = 128, assc = 8, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 29498ns
+Total L1 access counter: 10000
+Total L1 miss num: 5786
+Total L1 hit num: 4214
+L1 miss rate: 0.578600
+Total L1 replace num: 5530
+Total L1 fetch num: 8654
+Total L1 prefetch num: 0
+Total L1 access time: 29498
+
+
+---------M----------
+Total M access counter: 8654
+Total Memory access time: 865400
+
+
+size = 32, block_size = 128, assc = 8, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 15841ns
+Total L1 access counter: 10000
+Total L1 miss num: 7737
+Total L1 hit num: 2263
+L1 miss rate: 0.773700
+Total L1 replace num: 2509
+Total L1 fetch num: 7737
+Total L1 prefetch num: 0
+Total L1 access time: 15841
+
+
+---------M----------
+Total M access counter: 7752
+Total Memory access time: 775200
+
+
+size = 64, block_size = 256, assc = 8, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 78684ns
+Total L1 access counter: 10000
+Total L1 miss num: 3443
+Total L1 hit num: 6557
+L1 miss rate: 0.344300
+Total L1 replace num: 3187
+Total L1 fetch num: 5122
+Total L1 prefetch num: 0
+Total L1 access time: 78684
+
+
+---------M----------
+Total M access counter: 5122
+Total Memory access time: 512200
+
+
+size = 64, block_size = 256, assc = 8, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 41304ns
+Total L1 access counter: 10000
+Total L1 miss num: 6558
+Total L1 hit num: 3442
+L1 miss rate: 0.655800
+Total L1 replace num: 1330
+Total L1 fetch num: 6558
+Total L1 prefetch num: 0
+Total L1 access time: 41304
+
+
+---------M----------
+Total M access counter: 6573
+Total Memory access time: 657300
+
+
+size = 64, block_size = 128, assc = 16, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 51288ns
+Total L1 access counter: 10000
+Total L1 miss num: 5726
+Total L1 hit num: 4274
+L1 miss rate: 0.572600
+Total L1 replace num: 5214
+Total L1 fetch num: 8410
+Total L1 prefetch num: 0
+Total L1 access time: 51288
+
+
+---------M----------
+Total M access counter: 8410
+Total Memory access time: 841000
+
+
+size = 64, block_size = 128, assc = 16, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 27264ns
+Total L1 access counter: 10000
+Total L1 miss num: 7728
+Total L1 hit num: 2272
+L1 miss rate: 0.772800
+Total L1 replace num: 2244
+Total L1 fetch num: 7728
+Total L1 prefetch num: 0
+Total L1 access time: 27264
+
+
+---------M----------
+Total M access counter: 7743
+Total Memory access time: 774300
+
+
+size = 128, block_size = 128, assc = 8, set_num = 128
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 30597ns
+Total L1 access counter: 10000
+Total L1 miss num: 5629
+Total L1 hit num: 4371
+L1 miss rate: 0.562900
+Total L1 replace num: 4605
+Total L1 fetch num: 7928
+Total L1 prefetch num: 0
+Total L1 access time: 30597
+
+
+---------M----------
+Total M access counter: 7928
+Total Memory access time: 792800
+
+
+size = 128, block_size = 128, assc = 8, set_num = 128
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 15967ns
+Total L1 access counter: 10000
+Total L1 miss num: 7719
+Total L1 hit num: 2281
+L1 miss rate: 0.771900
+Total L1 replace num: 1723
+Total L1 fetch num: 7719
+Total L1 prefetch num: 0
+Total L1 access time: 15967
+
+
+---------M----------
+Total M access counter: 7734
+Total Memory access time: 773400
+
+
+
+trace2...
+
+size = 32, block_size = 64, assc = 8, set_num = 64
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 0ns
+Total L1 access counter: 32793
+Total L1 miss num: 32793
+Total L1 hit num: 0
+L1 miss rate: 1.000000
+Total L1 replace num: 32281
+Total L1 fetch num: 48510
+Total L1 prefetch num: 0
+Total L1 access time: 0
+
+
+---------M----------
+Total M access counter: 48510
+Total Memory access time: 4851000
+
+
+size = 32, block_size = 64, assc = 8, set_num = 64
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 0ns
+Total L1 access counter: 32793
+Total L1 miss num: 32793
+Total L1 hit num: 0
+L1 miss rate: 1.000000
+Total L1 replace num: 16325
+Total L1 fetch num: 32793
+Total L1 prefetch num: 0
+Total L1 access time: 0
+
+
+---------M----------
+Total M access counter: 32793
+Total Memory access time: 3279300
+
+
+size = 32, block_size = 128, assc = 8, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 103320ns
+Total L1 access counter: 32793
+Total L1 miss num: 18033
+Total L1 hit num: 14760
+L1 miss rate: 0.549904
+Total L1 replace num: 17777
+Total L1 fetch num: 27478
+Total L1 prefetch num: 0
+Total L1 access time: 103320
+
+
+---------M----------
+Total M access counter: 27478
+Total Memory access time: 2747800
+
+
+size = 32, block_size = 128, assc = 8, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 58772ns
+Total L1 access counter: 32793
+Total L1 miss num: 24397
+Total L1 hit num: 8396
+L1 miss rate: 0.743970
+Total L1 replace num: 8185
+Total L1 fetch num: 24397
+Total L1 prefetch num: 0
+Total L1 access time: 58772
+
+
+---------M----------
+Total M access counter: 24397
+Total Memory access time: 2439700
+
+
+size = 64, block_size = 256, assc = 8, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 274068ns
+Total L1 access counter: 32793
+Total L1 miss num: 9954
+Total L1 hit num: 22839
+L1 miss rate: 0.303540
+Total L1 replace num: 9698
+Total L1 fetch num: 15519
+Total L1 prefetch num: 0
+Total L1 access time: 274068
+
+
+---------M----------
+Total M access counter: 15519
+Total Memory access time: 1551900
+
+
+size = 64, block_size = 256, assc = 8, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 151248ns
+Total L1 access counter: 32793
+Total L1 miss num: 20189
+Total L1 hit num: 12604
+L1 miss rate: 0.615650
+Total L1 replace num: 3977
+Total L1 fetch num: 20189
+Total L1 prefetch num: 0
+Total L1 access time: 151248
+
+
+---------M----------
+Total M access counter: 20189
+Total Memory access time: 2018900
+
+
+size = 64, block_size = 128, assc = 16, set_num = 32
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 177336ns
+Total L1 access counter: 32793
+Total L1 miss num: 18015
+Total L1 hit num: 14778
+L1 miss rate: 0.549355
+Total L1 replace num: 17503
+Total L1 fetch num: 27334
+Total L1 prefetch num: 0
+Total L1 access time: 177336
+
+
+---------M----------
+Total M access counter: 27334
+Total Memory access time: 2733400
+
+
+size = 64, block_size = 128, assc = 16, set_num = 32
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 100776ns
+Total L1 access counter: 32793
+Total L1 miss num: 24395
+Total L1 hit num: 8398
+L1 miss rate: 0.743909
+Total L1 replace num: 7927
+Total L1 fetch num: 24395
+Total L1 prefetch num: 0
+Total L1 access time: 100776
+
+
+---------M----------
+Total M access counter: 24395
+Total Memory access time: 2439500
+
+
+size = 128, block_size = 128, assc = 8, set_num = 128
+write_through(back) = 0, write_alloc(no-alloc) = 1
+
+
+---------L1----------
+Total L1 access time: 103572ns
+Total L1 access counter: 32793
+Total L1 miss num: 17997
+Total L1 hit num: 14796
+L1 miss rate: 0.548806
+Total L1 replace num: 16973
+Total L1 fetch num: 27058
+Total L1 prefetch num: 0
+Total L1 access time: 103572
+
+
+---------M----------
+Total M access counter: 27058
+Total Memory access time: 2705800
+
+
+size = 128, block_size = 128, assc = 8, set_num = 128
+write_through(back) = 1, write_alloc(no-alloc) = 0
+
+
+---------L1----------
+Total L1 access time: 58786ns
+Total L1 access counter: 32793
+Total L1 miss num: 24395
+Total L1 hit num: 8398
+L1 miss rate: 0.743909
+Total L1 replace num: 7415
+Total L1 fetch num: 24395
+Total L1 prefetch num: 0
+Total L1 access time: 58786
+
+
+---------M----------
+Total M access counter: 24395
+Total Memory access time: 2439500
+
+
