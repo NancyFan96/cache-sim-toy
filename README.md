@@ -1,10 +1,28 @@
 # cache-sim-toy
 
+## QUICK START
+
+### Help info
+
+    This is a simulator for cache!
+    Usage: ./sim -f [filename]
+                 -l [cache level] -s [cache size] -a [way num] -b [block size]
+                 -p [policy1...l:0|1|2|3:(write_back&write_non_allocate)|(through&non_allc)|(back&alloc)|(through&alloc)]
+                 -h [l1 hitlatency] [l2 hitlatency]...
+                 --help
+
+* CacheLab 未实现真正读写
+
+* cache-v2, 重写了handler, 实现了真正的读写
+
 ## TODO
 
-* 多层Cache待dhy检验
+* Lab 3-2
 
-* 真的实现r/w
+
+## DONE
+
+* Lab 3-1
 
 
 ## LOGs
@@ -17,9 +35,14 @@
 
 2.0 commit: presudo cache r/w, result is RIGHT~
 
+3.0 commit: **DONE**
+
+
 ## 作业要求
 
-### 实现
+### Lab 3-1
+
+#### 实现
 根据提供的配置框架,实现一个可配置 Cache Size、Block Size、Set Associativity、 Replacement Policy(暂定 LRU)、Hit Latency 等参数的 Cache Simulator。具体要求如下:
 
 a) 该 simulator 应提供读取 trace 文件的接口(格式参照样例 trace 文件)以及与 Lab2 的 CPU simulator 的对接实现,并可以支持多层 cache 的架构;
@@ -40,7 +63,7 @@ f) 各层存储介质之间的传输延时暂不考虑。
 
 g) Replacement Policy 统一定为 LRU,其他优化策略暂不考虑。
 
-### 测试内容
+#### 测试内容
 测试内容包含两个部分,实验的代码及相应的测试结果请分开提交:
 
 a) 使用附件中给定的 trace 通过单一层次 cache 测试

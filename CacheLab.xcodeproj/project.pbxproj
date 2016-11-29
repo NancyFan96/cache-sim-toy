@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DB189F831DE5458B0048743E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB189F821DE5458B0048743E /* main.cpp */; };
+		DB189F901DE545CC0048743E /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = DB189F891DE545CC0048743E /* cache.cc */; };
+		DB189F911DE545CC0048743E /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = DB189F8C1DE545CC0048743E /* main.cc */; };
+		DB189F921DE545CC0048743E /* memory.cc in Sources */ = {isa = PBXBuildFile; fileRef = DB189F8D1DE545CC0048743E /* memory.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +26,13 @@
 
 /* Begin PBXFileReference section */
 		DB189F7F1DE5458B0048743E /* CacheLab */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CacheLab; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB189F821DE5458B0048743E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		DB189F891DE545CC0048743E /* cache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cache.cc; sourceTree = "<group>"; };
+		DB189F8A1DE545CC0048743E /* cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cache.h; sourceTree = "<group>"; tabWidth = 4; };
+		DB189F8B1DE545CC0048743E /* def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = def.h; sourceTree = "<group>"; };
+		DB189F8C1DE545CC0048743E /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		DB189F8D1DE545CC0048743E /* memory.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cc; sourceTree = "<group>"; };
+		DB189F8E1DE545CC0048743E /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		DB189F8F1DE545CC0048743E /* storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = storage.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +65,13 @@
 		DB189F811DE5458B0048743E /* CacheLab */ = {
 			isa = PBXGroup;
 			children = (
-				DB189F821DE5458B0048743E /* main.cpp */,
+				DB189F891DE545CC0048743E /* cache.cc */,
+				DB189F8A1DE545CC0048743E /* cache.h */,
+				DB189F8B1DE545CC0048743E /* def.h */,
+				DB189F8C1DE545CC0048743E /* main.cc */,
+				DB189F8D1DE545CC0048743E /* memory.cc */,
+				DB189F8E1DE545CC0048743E /* memory.h */,
+				DB189F8F1DE545CC0048743E /* storage.h */,
 			);
 			path = CacheLab;
 			sourceTree = "<group>";
@@ -119,7 +133,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB189F831DE5458B0048743E /* main.cpp in Sources */,
+				DB189F911DE545CC0048743E /* main.cc in Sources */,
+				DB189F901DE545CC0048743E /* cache.cc in Sources */,
+				DB189F921DE545CC0048743E /* memory.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +262,7 @@
 				DB189F881DE5458B0048743E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
