@@ -1,0 +1,15 @@
+rm -f ./out.csv
+I=1024 
+J=1
+
+while (($I<=134217728))
+do
+  J=1
+  while (($J<=64))
+  do
+  	./cacti $I $J
+  	J=$((J*2))
+  done
+  ./cacti $I full
+  I=$((I*2))
+done
