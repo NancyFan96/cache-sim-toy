@@ -1,5 +1,11 @@
 # cache-sim-toy
 
+## LOGs - cont.
+
+* commit 4.0: Lab3-2 begin, output.csv is the output of runtest in cacti5.3/, cacti5.3 is compiled correctly on Linux, please use it on your Linux to prevent unexpected errors in results
+
+
+
 ## QUICK START
 
 ### Help info
