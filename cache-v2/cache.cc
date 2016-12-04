@@ -89,7 +89,10 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int rw, char *content, int &
     
     printf("\naddr = 0x%llx(%lld), offset_set = %d, offset_tag = %d\n", addr, addr, offset_set, offset_tag);
     printf("set = 0x%x, tag = 0x%x, offset = 0x%x, read = %d\n", set, tag, offset, rw);
-    
+ 
+    time += latency_.bus_latency;
+    stats_.access_time += latency_.bus_latency;
+   
     // process asking for multiblocks
     int overbytes = offset + bytes - config_.block_size;
     if(overbytes > 0){
@@ -101,8 +104,11 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int rw, char *content, int &
     
     // Bypass
     if (!BypassDecision()) {
-        PartitionAlgorithm();
+        // PartitionAlgorithm();
         
+        time += latency_.hit_latency;
+        stats_.access_time += latency_.hit_latency;
+
         int target = -1;
         int condition = ReplaceDecision(set, tag, target);
         hit = (condition == HIT) ? 1:0;
@@ -111,8 +117,6 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int rw, char *content, int &
 
         if(condition == HIT){
             hit = 1;
-            time += latency_.bus_latency + latency_.hit_latency;
-            stats_.access_time += latency_.bus_latency + latency_.hit_latency;
             SetRPP(set, cache_[set][target]);
             
             if(rw == WRITE){
@@ -134,8 +138,6 @@ void Cache::HandleRequest(uint64_t addr, int bytes, int rw, char *content, int &
         else{// MISS
             hit = 0;
             stats_.miss_num++;
-            time += latency_.bus_latency;
-            stats_.access_time += latency_.bus_latency;
             
             if(rw == WRITE && config_.write_allocate == 0){// write no alloc
                 lower_->HandleRequest(addr, bytes, rw, content, hit, time);

@@ -9,6 +9,10 @@
 TypeName(const TypeName&); \
 void operator=(const TypeName&)
 
+#define READ 1
+#define WRITE 0
+
+
 // Storage access stats
 typedef struct StorageStats_ {
     int access_counter;

@@ -40,11 +40,14 @@ void Initial(StorageStats& storage_stats, StorageLatency& latency_m, StorageLate
     latency_m.bus_latency = 100;
     latency_m.hit_latency = 0;
     
-    for(int i = 1; i <= MAXLEVEL; i++)
-    {
-        latency_c[i].bus_latency = 0;
-        latency_c[i].hit_latency = 10;
-    }
+    latency_c[1].bus_latency = 0;
+    latency_c[1].hit_latency = 10;
+
+    latency_c[2].bus_latency = 3;
+    latency_c[2].hit_latency = 10;
+
+    latency_c[3].bus_latency = 6;
+    latency_c[3].hit_latency = 10;
     
     for(int i = 1; i <= MAXLEVEL; i++)
     {
@@ -205,6 +208,7 @@ int main(int argc,char *argv[])
         //printf("Request access time: %dns\n", time);
     }
     StorageStats s;
+    int totalTime = 0;
     for(int i = 1; i <= levelNum; i++){
         l[i].GetStats(s);
         printf("\n\n---------L%d----------\n", i);
@@ -217,11 +221,16 @@ int main(int argc,char *argv[])
         printf("Total L%d fetch num: %d\n", i, s.fetch_num);
         printf("Total L%d prefetch num: %d\n", i, s.prefetch_num);
         printf("Total L%d access time: %d\n", i, s.access_time);
+        totalTime += s.access_time;
     }
     m.GetStats(s);
     printf("\n\n---------M----------\n");
     printf("Total M access counter: %d\n", s.access_counter);
     printf("Total Memory access time: %d\n\n\n", s.access_time);
+    totalTime += s.access_time;
+
+
+    printf("\n\n*********Total access time: %d\n\n*********", totalTime);
     fclose(input);
     return 0;
 }

@@ -33,9 +33,11 @@ Cache::Cache()
     for(int i = 0; i < config_.set_num; i++) {
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+#ifdef RW
         for(int j = 0; j < config_.associativity; j++){
             cache_[i][j].block_content = new char[config_.block_size];
         }
+#endif
     }
 }
 
@@ -50,7 +52,7 @@ void Cache::SetConfig(CacheConfig cc)
     config_ .write_through = cc.write_through;
     config_ .write_allocate = cc.write_allocate;
     
-    printf("size = %d, block_size = %d, assc = %d, set_num = %d\n",
+    printf("\n\n------------Cache Setting------------\n\nsize = %d, block_size = %d, assc = %d, set_num = %d\n",
            config_ .size, config_ .block_size, config_ .associativity, config_ .set_num);
     printf("write_through(back) = %d, write_alloc(no-alloc) = %d\n", config_ .write_through, config_ .write_allocate);
     
@@ -63,9 +65,11 @@ void Cache::SetConfig(CacheConfig cc)
     for(int i = 0; i < config_.set_num; i++) {
         cache_[i] = new Block[config_.associativity];
         memset(cache_[i], 0, sizeof(Block)*config_.associativity);
+#ifdef RW
         for(int j = 0; j < config_.associativity; j++){
             cache_[i][j].block_content = new char[config_.block_size];
         }
+#endif
     }
 }
 
@@ -80,175 +84,126 @@ void Cache::GetConfig(CacheConfig cc)
 }
 
 
-void Cache::HandleRequest(uint64_t addr, int bytes, int read,
-                          char *content, int &hit, int &time) {
-    hit = 0;
-    time = 0;
-    int set;
-    unsigned int tag, offset;
-    int target = -1;
-    int condition = -1;
+void Cache::HandleRequest(uint64_t addr, int bytes, int rw, char *content, int &hit, int &time) {
+    int offset_set = lg2(config_.block_size);
+    int offset_tag = lg2(config_.set_num) + lg2(config_.block_size);
+    unsigned int set = (unsigned int)GETSET(addr, offset_tag, offset_set);
+    unsigned int tag = (unsigned int)GETTAG(addr, offset_tag);
+    unsigned int offset = (unsigned int)GETOFFSET(addr, offset_set);
+
+#ifdef DEBUG
+    printf("\naddr = 0x%llx(%lld), offset_set = %d, offset_tag = %d\n", addr, addr, offset_set, offset_tag);
+    printf("set = 0x%x, tag = 0x%x, offset = 0x%x, read = %d\n", set, tag, offset, rw);
+#endif
+    
+    time += latency_.bus_latency;
+    stats_.access_time += latency_.bus_latency;
+    
+    // process asking for multiblocks
+    int overbytes = offset + bytes - config_.block_size;
+    if(overbytes > 0){
+        int first_bytes = config_.block_size - offset;
+        HandleRequest(addr, first_bytes, rw, content, hit, time);
+        HandleRequest(addr + first_bytes, overbytes, rw, content + first_bytes, hit, time);
+        return;
+    }
     
     // Bypass
     if (!BypassDecision()) {
-        PartitionAlgorithm();
-        int offset_set = lg2(config_.block_size);
-        int offset_tag = lg2(config_.set_num) + lg2(config_.block_size);
-        set = (int)((addr & ONES((offset_tag-1),offset_set)) >> offset_set);
-        tag = (unsigned int)((addr & ONES(63,offset_tag)) >> offset_tag);
-        offset = (unsigned int)(addr & ONES((offset_tag-1), 0));
+        // PartitionAlgorithm();
         
-        //printf("\naddr = 0x%llx(%lld), offset_set = %d, offset_tag = %d\n", addr, addr, offset_set, offset_tag);
-        //printf("set = 0x%x, tag = 0x%x, offset = 0x%x, read = %d\n", set, tag, offset, read);
+        time += latency_.hit_latency;
+        stats_.access_time += latency_.hit_latency;
         
-        condition = ReplaceDecision(set, tag, target);
-        //printf("condition TAG = %d(0|1|2:hit|cold|conflict)\t", condition);
-        
+        int target = -1;
+        int condition = ReplaceDecision(set, tag, target);
         hit = (condition == HIT) ? 1:0;
         stats_.access_counter++;
-        if (hit == 0) {
-            stats_.miss_num++;
-        }
-        
-        switch (condition) {
-            case CONFLICT_MISS:
-                if((read == WRITE) && (config_.write_allocate == 0)){
-                   // write miss, write no allc, lower_->HandleRequest
-                    int lower_hit, lower_time;
-                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+#ifdef DEBUG
+        printf("condition TAG = %d(0|1|2:hit|cold|conflict)\t", condition);
+#endif
+        if(condition == HIT){
+            hit = 1;
+            SetRPP(set, cache_[set][target]);
+            
+            if(rw == WRITE){
+#ifdef RW
+                memcpy(cache_[set][target].block_content + offset, content, bytes);
+#endif
+                if(config_.write_through){ // new fetch to lower cache because of write policy
+                    int lower_hit = 0, lower_time = 0;
+                    lower_->HandleRequest(addr, bytes, rw, content, lower_hit, lower_time);
                     stats_.fetch_num++;
-                    time += latency_.bus_latency + lower_time;
-                    stats_.access_time += latency_.bus_latency;
-                    //no block evicted, no fetch from lower layer
-                    break;
                 }
-                target = ReplaceAlgorithm(set);
-                //printf("target = %d\n", target);
-
-                // evict, mind dirty bit(dirty bit is only valid under writeback policy)
+                else{
+                    cache_[set][target].dirty_bit = TRUE;
+                }
+            }else{
+#ifdef RW
+                memcpy(content, cache_[set][target].block_content + offset, bytes);
+#endif
+            }
+            
+            return;
+        }
+        else{// MISS
+            hit = 0;
+            stats_.miss_num++;
+            
+            if(rw == WRITE && config_.write_allocate == 0){// write no alloc
+                lower_->HandleRequest(addr, bytes, rw, content, hit, time);
+                stats_.fetch_num++;
+                return;
+            }
+            
+            if(target == -1){// do an evict,
+                target = ReplaceAlgorithm(set);     // chose a victim
+                
                 stats_.replace_num++;
                 cache_[set][target].valid_bit = 0;
-                //printf("hhh\n");
-                if(config_.write_through == 0 && cache_[set][target].dirty_bit == 1){
-                    int lower_hit, lower_time;
+                if(config_.write_through == 0 && cache_[set][target].dirty_bit == 1){ // otherwise, just cast the block
+                    int lower_hit = 0, lower_time = 0;
                     uint64_t victim_address = (tag<<offset_tag)||(set<<offset_set);
                     char *victim_content = new char[config_.block_size];
+#ifdef RW
                     memcpy(victim_content, cache_[set][target].block_content, config_.block_size);
-                    lower_->HandleRequest(victim_address, config_.block_size, WRITE, victim_content,
-                                          lower_hit, lower_time);
-                    stats_.fetch_num++;                }
-            case COLD_MISS:
-                // load
-                if (PrefetchDecision()) {
-                    PrefetchAlgorithm(); // change some load arguments, no need for Lab3-1
-                }
-                //printf("target = %d\n", target);
-                if(read == READ || (read == WRITE && config_.write_allocate == 1)){
-                    cache_[set][target].valid_bit = 1;
-                    cache_[set][target].dirty_bit = 0;
-                    cache_[set][target].tag = tag;
-                    SetRPP(set, cache_[set][target]);
-                }
-                
-                if(read == WRITE && config_.write_allocate == 0){
-                    cache_[set][target].dirty_bit = 1;
-
-                    int lower_hit, lower_time;
-                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
+#endif
+                    lower_->HandleRequest(victim_address, config_.block_size, WRITE, victim_content, lower_hit, lower_time);
                     stats_.fetch_num++;
-                    time += latency_.bus_latency + lower_time;
-                    stats_.access_time += latency_.bus_latency;
-                    break;
                 }
-                if(read == WRITE && config_.write_allocate == 1){
+            }
+            
+            // load a block into current cache from lower
+            char * new_block_content = new char[config_.block_size];
+            int lower_hit;
+            lower_->HandleRequest(addr - offset, config_.block_size, READ, new_block_content, lower_hit, time);
+            stats_.fetch_num++;
+#ifdef RW
+            memcpy(cache_[set][target].block_content, new_block_content, config_.block_size);
+#endif
+            cache_[set][target].valid_bit = 1;
+            cache_[set][target].dirty_bit = 0;         // -1 means invalid
+            cache_[set][target].tag = tag;
+            SetRPP(set, cache_[set][target]);
+            
+            // other types of miss, now restart with a implict hit and r/w
+            if(rw == WRITE && config_.write_allocate ==1){
+#ifdef RW
+                memcpy(cache_[set][target].block_content+offset, content, bytes);
+#endif
+                if(config_.write_through == 0)
                     cache_[set][target].dirty_bit = 1;
-
-                    int lower_hit, lower_time;
-                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
-                    stats_.fetch_num++;
-                    while(bytes!=0){
-                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
-                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
-                        bytes -= cur_read_bytes;
-                        target++;
-                        if(target == config_.associativity){
-                            set++;
-                            target = 0;
-                        }
-                    }
-                    time += latency_.bus_latency + lower_time;
-                    stats_.access_time += latency_.bus_latency;
-                    break;
-                }
-                if(read == READ){
-                    //printf("hhh\n");
-                    int lower_hit, lower_time;
-                    lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
-                    stats_.fetch_num++;
-                    //printf("hhh\n");
-                    while(bytes!=0){
-                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
-                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
-                        bytes -= cur_read_bytes;
-                        target++;
-                        if(target == config_.associativity){
-                            set++;
-                            target = 0;
-                        }
-                    }
-                    time += latency_.bus_latency + lower_time;
-                    stats_.access_time += latency_.bus_latency;
-                    break;
-                }
-                
-                
-            case HIT:
-                // read hit, write hit(writeback or writethrough)
-                // for HIT: 0|1 for back(set dirty bit, only change cache)|through(write both cache and lower level)
-                //printf("target = %d\n", target);
-                if(read == true){
-                    cache_[set][target].valid_bit = 1;
-                    cache_[set][target].tag = tag;
-                    SetRPP(set, cache_[set][target]);
-                    while(bytes!=0){
-                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
-                        memcpy(content, cache_[set][target].block_content, cur_read_bytes);
-                        bytes -= cur_read_bytes;
-                        target++;
-                        if(target == config_.associativity){
-                            set++;
-                            target = 0;
-                        }
-                    }//while: read by byte
-                 }
-                else{
-                    // write back, write through use a buffer, so no latency need to plus
-                    cache_[set][target].valid_bit = 1;
-                    cache_[set][target].dirty_bit = 1;
-                    cache_[set][target].tag = tag;
-                    SetRPP(set, cache_[set][target]);
-                    while(bytes!=0){
-                        int cur_read_bytes = (bytes < config_.block_size) ? bytes : config_.block_size;
-                        memcpy(cache_[set][target].block_content, content, cur_read_bytes);
-                        bytes -= cur_read_bytes;
-                        target++;
-                        if(target == config_.associativity){
-                            set++;
-                            target = 0;
-                        }
-                    }//while: write by byte
-                    if(config_.write_through == 1){
-                        int lower_hit, lower_time;
-                        lower_->HandleRequest(addr, bytes, read, content, lower_hit, lower_time);
-                    }
-                }
-                
-                time += latency_.bus_latency + latency_.hit_latency;
-                stats_.access_time += time;
-                break;
-        }
-    }
+            }else{// rw == READ
+#ifdef RW
+                memcpy(content, cache_[set][target].block_content+offset, bytes);
+#endif
+            }
+            
+            
+        }// MISS
+    }// NO bypassing
 }
+
 
 
 int Cache::BypassDecision() {
@@ -266,11 +221,10 @@ int Cache::ReplaceDecision(const int set, const unsigned int tag, int & target) 
             return HIT;
         }
         if(target == -1 && cache_[set][i].valid_bit == false){
-            target = i;
+            target = i;             // set has slots, target refers to the first slot in this set
         }
     }
-    if(target != -1) return COLD_MISS;       // set has slots, target refers to the first slot in this set
-    return CONFLICT_MISS;
+    return MISS;
 }
 
 int Cache::ReplaceAlgorithm(const int set){
@@ -282,13 +236,15 @@ int Cache::ReplaceAlgorithm(const int set){
             victim = i;
         }
     }
-/*
- for(int j = 0; j < config_.associativity; j++){
-        printf("%llu\t", cache_[set][j].RPP_tag);
-    }
-    printf("\n");
-    printf("victim = %d\n", victim);
-*/
+#ifdef DEBUG
+     for(int j = 0; j < config_.associativity; j++){
+     printf("%llu\t", cache_[set][j].RPP_tag);
+     }
+     printf("\n");
+     printf("victim = %d\n", victim);
+#endif
+    
+    
     
     return victim;
 }
